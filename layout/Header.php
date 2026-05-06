@@ -211,7 +211,7 @@ if(session_status() === PHP_SESSION_NONE){
                     <?php if(isset($_SESSION['guest_id'])): ?>
 
                         <?php if(($_SESSION['role'] ?? '') === 'admin'): ?>
-                            <a href="/trivago/admin/index.php" class="nav-link-custom">
+                            <a href="/trivago/admin/admin_dashboard.php" class="nav-link-custom">
                                 <i class="bi bi-speedometer2 me-1"></i>Admin Panel
                             </a>
                         <?php endif; ?>

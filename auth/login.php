@@ -24,15 +24,15 @@ if(isset($_POST['login'])){
             $_SESSION['guest_name']    = $guest['Guest_Name'];
             $_SESSION['guest_email']   = $guest['Guest_Email'];
             $_SESSION['member_status'] = $guest['Guest_MemberStatus'];
-            $_SESSION['role']          = ($guest['Guest_MemberStatus'] === 'admin') ? 'admin' : 'member';
+            $_SESSION['role'] = ($guest['Guest_MemberStatus'] === 'admin') ? 'admin' : 'member';
 
             // ========================
             // REDIRECT
             // ========================
             if($_SESSION['role'] === 'admin'){
-                header("Location: ../admin/index.php");
+                header("Location: /trivago/admin/admin_dashboard.php");
             } else {
-                header("Location: ../index.php");
+                header("Location: /trivago/index.php");
             }
             exit();
 
