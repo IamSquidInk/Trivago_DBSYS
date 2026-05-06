@@ -317,7 +317,7 @@ include "layout/header.php";
                         bp.Bkprt_MarketplaceModel,
                         bp.Bkprt_VerificationStatus,
                         MIN(rbp.Rbp_Price) AS lowest_price,
-                        rbp.Rbp_Notes
+                        ANY_VALUE(rbp.Rbp_Notes) AS Rbp_Notes
                     FROM Room_Booking_Partner rbp
                     JOIN Room r             ON r.Room_Id    = rbp.Rbp_RoomId
                     JOIN Booking_Partner bp ON bp.Bkprt_Id  = rbp.Rbp_BkprtId
