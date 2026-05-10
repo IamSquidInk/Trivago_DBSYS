@@ -97,7 +97,7 @@ if(isset($_POST['upload_image'])){
     } else {
         $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
         $filename = "hotel_" . $hotelId . "_" . time() . "." . $ext;
-        $destPath = "../assets/images/hotels/" . $filename;
+        $destPath = $_SERVER['DOCUMENT_ROOT'] . "/trivago/assets/images/hotels/" . $filename;
         $dbPath   = "assets/images/hotels/" . $filename;
 
         if(move_uploaded_file($file['tmp_name'], $destPath)){
@@ -139,7 +139,7 @@ if(isset($_GET['delete_image'])){
     $img     = $conn->query("SELECT Image_Path FROM Hotel_Images WHERE Image_Id = $imageId")->fetch_assoc();
 
     if($img){
-        $filePath = "../" . $img['Image_Path'];
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . "/trivago/" . $img['Image_Path'];
         if(file_exists($filePath)) unlink($filePath);
         $conn->query("DELETE FROM Hotel_Images WHERE Image_Id = $imageId");
         $success = "Image deleted successfully!";

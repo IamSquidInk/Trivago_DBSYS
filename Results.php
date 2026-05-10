@@ -2,7 +2,6 @@
 session_start();
 require_once "config/db.php";
 
-// ── GET SEARCH PARAMS ──
 $destination = isset($_GET['destination']) ? $conn->real_escape_string($_GET['destination']) : '';
 $checkin     = isset($_GET['checkin'])     ? $_GET['checkin']     : '';
 $checkout    = isset($_GET['checkout'])    ? $_GET['checkout']    : '';
@@ -13,23 +12,15 @@ include "layout/header.php";
 ?>
 
 <style>
-    /* ── SEARCH BAR (compact) ── */
     .search-bar-compact {
-        background: #ffffff;
-        border-bottom: 1px solid #e8e8e8;
-        padding: 14px 0;
-        margin-top: -20px;
-        position: sticky;
-        top: 64px;
-        z-index: 100;
+        background: #ffffff; border-bottom: 1px solid #e8e8e8;
+        padding: 14px 0; margin-top: -20px;
+        position: sticky; top: 64px; z-index: 100;
     }
 
     .search-input-sm {
-        border: 1.5px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-size: 13px;
-        transition: border-color 0.2s ease;
+        border: 1.5px solid #e0e0e0; border-radius: 8px;
+        padding: 8px 12px; font-size: 13px; transition: border-color 0.2s ease;
     }
 
     .search-input-sm:focus {
@@ -38,140 +29,79 @@ include "layout/header.php";
     }
 
     .search-label-sm {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--trivago-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-        display: block;
+        font-size: 11px; font-weight: 600; color: var(--trivago-muted);
+        text-transform: uppercase; letter-spacing: 0.5px;
+        margin-bottom: 4px; display: block;
     }
 
-    /* ── RESULTS ── */
-    .results-count {
-        font-size: 14px;
-        color: var(--trivago-muted);
-        margin-bottom: 16px;
-    }
+    .results-count { font-size: 14px; color: var(--trivago-muted); margin-bottom: 16px; }
 
-    /* ── HOTEL RESULT CARD ── */
     .hotel-result-card {
-        background: #ffffff;
-        border-radius: 14px;
+        background: #ffffff; border-radius: 14px;
         box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-        margin-bottom: 16px;
-        overflow: hidden;
-        transition: box-shadow 0.2s ease;
-        display: flex;
+        margin-bottom: 16px; overflow: hidden;
+        transition: box-shadow 0.2s ease; display: flex;
     }
 
-    .hotel-result-card:hover {
-        box-shadow: 0 8px 28px rgba(0,0,0,0.10);
-    }
+    .hotel-result-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.10); }
 
     .hotel-result-img {
-        width: 220px;
-        min-height: 160px;
-        background: #f0f0f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+        width: 220px; min-height: 160px; flex-shrink: 0;
+        background: #f0f0f0; overflow: hidden;
+    }
+
+    .hotel-result-img img {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+
+    .hotel-result-img-placeholder {
+        width: 100%; height: 100%; min-height: 160px;
+        display: flex; align-items: center; justify-content: center;
     }
 
     .hotel-result-body {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
+        padding: 20px; flex-grow: 1;
+        display: flex; justify-content: space-between;
+        align-items: center; gap: 16px;
     }
 
-    .hotel-result-info {
-        flex-grow: 1;
-    }
+    .hotel-result-info  { flex-grow: 1; }
+    .hotel-result-name  { font-size: 18px; font-weight: 700; color: var(--trivago-dark); margin-bottom: 4px; }
+    .hotel-result-location { font-size: 13px; color: var(--trivago-muted); margin-bottom: 8px; }
+    .hotel-result-desc  { font-size: 13px; color: #555; margin-bottom: 0; }
 
-    .hotel-result-name {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--trivago-dark);
-        margin-bottom: 4px;
-    }
-
-    .hotel-result-location {
-        font-size: 13px;
-        color: var(--trivago-muted);
-        margin-bottom: 8px;
-    }
-
-    .hotel-result-desc {
-        font-size: 13px;
-        color: #555;
-        margin-bottom: 0;
-    }
-
-    .hotel-result-price {
-        text-align: right;
-        flex-shrink: 0;
-        min-width: 160px;
-    }
-
-    .price-from {
-        font-size: 11px;
-        color: var(--trivago-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .price-amount {
-        font-size: 26px;
-        font-weight: 700;
-        color: var(--trivago-blue);
-        line-height: 1.1;
-    }
-
-    .price-night {
-        font-size: 12px;
-        color: var(--trivago-muted);
-        margin-bottom: 10px;
-    }
+    .hotel-result-price { text-align: right; flex-shrink: 0; min-width: 160px; }
+    .price-from   { font-size: 11px; color: var(--trivago-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .price-amount { font-size: 26px; font-weight: 700; color: var(--trivago-blue); line-height: 1.1; }
+    .price-night  { font-size: 12px; color: var(--trivago-muted); margin-bottom: 10px; }
 
     .no-results {
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 60px 20px;
-        text-align: center;
+        background: #ffffff; border-radius: 14px;
+        padding: 60px 20px; text-align: center;
         box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     }
 </style>
 
-<!-- ══════════════════════════════════════════════ -->
-<!--          COMPACT SEARCH BAR (TOP)             -->
-<!-- ══════════════════════════════════════════════ -->
+<!-- COMPACT SEARCH BAR -->
 <div class="search-bar-compact">
     <div class="container">
         <form method="GET" action="results.php">
             <div class="row g-2 align-items-end">
-
                 <div class="col-lg-4 col-md-6">
                     <label class="search-label-sm"><i class="bi bi-geo-alt me-1"></i>Destination</label>
                     <input type="text" name="destination" class="form-control search-input-sm"
                            value="<?= htmlspecialchars($destination) ?>" required>
                 </div>
-
                 <div class="col-lg-2 col-md-6">
                     <label class="search-label-sm"><i class="bi bi-calendar me-1"></i>Check-in</label>
                     <input type="date" name="checkin" class="form-control search-input-sm"
                            value="<?= htmlspecialchars($checkin) ?>" required>
                 </div>
-
                 <div class="col-lg-2 col-md-6">
                     <label class="search-label-sm"><i class="bi bi-calendar-check me-1"></i>Check-out</label>
                     <input type="date" name="checkout" class="form-control search-input-sm"
                            value="<?= htmlspecialchars($checkout) ?>" required>
                 </div>
-
                 <div class="col-lg-2 col-md-6">
                     <label class="search-label-sm"><i class="bi bi-person me-1"></i>Guests</label>
                     <select name="guests" class="form-control search-input-sm">
@@ -182,48 +112,36 @@ include "layout/header.php";
                         <?php endfor; ?>
                     </select>
                 </div>
-
                 <div class="col-lg-2 col-md-12">
                     <button type="submit" class="btn btn-trivago w-100" style="padding:8px;">
                         <i class="bi bi-search me-1"></i>Search
                     </button>
                 </div>
-
             </div>
         </form>
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════════ -->
-<!--               RESULTS SECTION                 -->
-<!-- ══════════════════════════════════════════════ -->
+<!-- RESULTS -->
 <div class="container mt-4 mb-5">
-
     <?php if($destination): ?>
-
         <?php
-        // ── QUERY: hotels matching destination + rooms with capacity >= guests ──
         $query = "
             SELECT DISTINCT
-                h.Hotel_Id,
-                h.Hotel_Name,
-                h.Hotel_City,
-                h.Hotel_Country,
-                h.Hotel_Rating,
-                h.Hotel_Description,
+                h.Hotel_Id, h.Hotel_Name, h.Hotel_City, h.Hotel_Country,
+                h.Hotel_Rating, h.Hotel_Description,
                 MIN(rbp.Rbp_Price) AS lowest_price
             FROM Hotel h
-            JOIN Room r       ON r.Room_HotelId = h.Hotel_Id
+            JOIN Room r              ON r.Room_HotelId  = h.Hotel_Id
             JOIN Room_Booking_Partner rbp ON rbp.Rbp_RoomId = r.Room_Id
             WHERE (h.Hotel_City    LIKE '%$destination%'
                OR  h.Hotel_Country LIKE '%$destination%'
                OR  h.Hotel_Name    LIKE '%$destination%')
               AND r.Room_Availability = 'Available'
-              AND r.Room_Capacity >= $guests
+              AND r.Room_Capacity    >= $guests
             GROUP BY h.Hotel_Id
             ORDER BY lowest_price ASC
         ";
-
         $results = $conn->query($query);
         $count   = $results ? $results->num_rows : 0;
         ?>
@@ -236,18 +154,26 @@ include "layout/header.php";
         </p>
 
         <?php if($count > 0): ?>
-            <?php while($hotel = $results->fetch_assoc()): ?>
-
+            <?php while($hotel = $results->fetch_assoc()):
+                $cover = $conn->query("
+                    SELECT Image_Path FROM Hotel_Images
+                    WHERE Image_HotelId = {$hotel['Hotel_Id']} AND Image_IsCover = 1
+                    LIMIT 1
+                ")->fetch_assoc();
+            ?>
             <a href="hotel.php?id=<?= $hotel['Hotel_Id'] ?>&checkin=<?= urlencode($checkin) ?>&checkout=<?= urlencode($checkout) ?>&guests=<?= $guests ?>"
                class="text-decoration-none">
                 <div class="hotel-result-card">
-
-                    <!-- IMAGE -->
                     <div class="hotel-result-img">
-                        <i class="bi bi-building" style="font-size:40px; color:#ccc;"></i>
+                        <?php if($cover): ?>
+                            <img src="/trivago/<?= htmlspecialchars($cover['Image_Path']) ?>"
+                                 alt="<?= htmlspecialchars($hotel['Hotel_Name']) ?>">
+                        <?php else: ?>
+                            <div class="hotel-result-img-placeholder">
+                                <i class="bi bi-building" style="font-size:40px; color:#ccc;"></i>
+                            </div>
+                        <?php endif; ?>
                     </div>
-
-                    <!-- INFO -->
                     <div class="hotel-result-body">
                         <div class="hotel-result-info">
                             <p class="hotel-result-name"><?= htmlspecialchars($hotel['Hotel_Name']) ?></p>
@@ -255,7 +181,6 @@ include "layout/header.php";
                                 <i class="bi bi-geo-alt-fill me-1" style="color:var(--trivago-blue);"></i>
                                 <?= htmlspecialchars($hotel['Hotel_City']) ?>, <?= htmlspecialchars($hotel['Hotel_Country']) ?>
                             </p>
-                            <!-- STARS -->
                             <div class="mb-2">
                                 <?php for($s = 1; $s <= 5; $s++): ?>
                                     <i class="bi <?= $s <= $hotel['Hotel_Rating'] ? 'bi-star-fill' : 'bi-star' ?>"
@@ -266,21 +191,15 @@ include "layout/header.php";
                                 <?= htmlspecialchars(substr($hotel['Hotel_Description'], 0, 100)) ?>...
                             </p>
                         </div>
-
-                        <!-- PRICE -->
                         <div class="hotel-result-price">
                             <p class="price-from">From</p>
-                            <p class="price-amount">
-                                ₱<?= number_format($hotel['lowest_price'], 2) ?>
-                            </p>
+                            <p class="price-amount">₱<?= number_format($hotel['lowest_price'], 2) ?></p>
                             <p class="price-night">per night</p>
                             <span class="btn btn-trivago btn-sm">See deals</span>
                         </div>
-
                     </div>
                 </div>
             </a>
-
             <?php endwhile; ?>
 
         <?php else: ?>
@@ -291,9 +210,7 @@ include "layout/header.php";
                 <a href="index.php" class="btn btn-trivago mt-2">Back to Search</a>
             </div>
         <?php endif; ?>
-
     <?php endif; ?>
-
 </div>
 
 <?php include "layout/footer.php"; ?>
