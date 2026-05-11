@@ -15,16 +15,16 @@ if(!$hotelQuery || $hotelQuery->num_rows === 0){
 
 $hotel = $hotelQuery->fetch_assoc();
 
-// ── FETCH ALL HOTEL IMAGES ──
+// ── FETCH ALL HOTEL IMAGES WITH CAPTIONS ──
 $hotelImagesQuery = $conn->query("
-    SELECT Image_Path FROM Hotel_Images
+    SELECT Image_Path, Image_Caption FROM Hotel_Images
     WHERE Image_HotelId = $hotel_id
     ORDER BY Image_IsCover DESC, Image_AddedDate ASC
 ");
 
-// ── FETCH ALL ROOM IMAGES FOR THIS HOTEL ──
+// ── FETCH ALL ROOM IMAGES WITH CAPTIONS ──
 $roomImagesQuery = $conn->query("
-    SELECT ri.Image_Path FROM Room_Images ri
+    SELECT ri.Image_Path, ri.Image_Caption FROM Room_Images ri
     JOIN Room r ON r.Room_Id = ri.Image_RoomId
     WHERE r.Room_HotelId = $hotel_id
     ORDER BY ri.Image_IsCover DESC, ri.Image_AddedDate ASC
@@ -34,12 +34,18 @@ $roomImagesQuery = $conn->query("
 $allImages = [];
 if($hotelImagesQuery){
     while($img = $hotelImagesQuery->fetch_assoc()){
-        $allImages[] = $img['Image_Path'];
+        $allImages[] = [
+            'path'    => $img['Image_Path'],
+            'caption' => $img['Image_Caption'] ?? ''
+        ];
     }
 }
 if($roomImagesQuery){
     while($img = $roomImagesQuery->fetch_assoc()){
-        $allImages[] = $img['Image_Path'];
+        $allImages[] = [
+            'path'    => $img['Image_Path'],
+            'caption' => $img['Image_Caption'] ?? ''
+        ];
     }
 }
 
@@ -68,27 +74,42 @@ include "layout/header.php";
 
     /* ── CAROUSEL ── */
     .hotel-carousel {
-        position: relative;
-        border-radius: 14px;
-        overflow: hidden;
-        margin-bottom: 20px;
-        background: #1a1a2e;
-        height: 340px;
+        position: relative; border-radius: 14px;
+        overflow: hidden; margin-bottom: 20px;
+        background: #1a1a2e; height: 340px;
     }
 
-    .carousel-img {
-        width: 100%; height: 340px;
-        object-fit: cover;
+    .carousel-slide {
         display: none;
-        border-radius: 14px;
+        position: relative;
+        width: 100%; height: 340px;
     }
 
-    .carousel-img.active { display: block; }
+    .carousel-slide.active { display: block; }
+
+    .carousel-slide img {
+        width: 100%; height: 340px; object-fit: cover;
+    }
+
+    /* ── CAPTION OVERLAY ── */
+    .carousel-caption {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+        padding: 28px 16px 14px;
+    }
+
+    .carousel-caption-text {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
 
     .carousel-placeholder {
         width: 100%; height: 340px;
         display: flex; align-items: center; justify-content: center;
-        border-radius: 14px;
     }
 
     .carousel-btn {
@@ -98,8 +119,7 @@ include "layout/header.php";
         width: 42px; height: 42px;
         display: flex; align-items: center; justify-content: center;
         font-size: 18px; cursor: pointer;
-        transition: background 0.2s ease;
-        z-index: 10;
+        transition: background 0.2s ease; z-index: 10;
     }
 
     .carousel-btn:hover { background: rgba(0,0,0,0.7); }
@@ -107,10 +127,11 @@ include "layout/header.php";
     .carousel-btn.next  { right: 12px; }
 
     .carousel-counter {
-        position: absolute; bottom: 12px; right: 14px;
+        position: absolute; top: 12px; right: 14px;
         background: rgba(0,0,0,0.5); color: #fff;
         font-size: 12px; font-weight: 600;
         padding: 4px 10px; border-radius: 20px;
+        z-index: 10;
     }
 
     /* ── ROOM TABLE ── */
@@ -200,10 +221,18 @@ include "layout/header.php";
 
                 <?php if(count($allImages) > 0): ?>
 
-                    <?php foreach($allImages as $index => $imgPath): ?>
-                        <img src="/trivago/<?= htmlspecialchars($imgPath) ?>"
-                             class="carousel-img <?= $index === 0 ? 'active' : '' ?>"
+                    <?php foreach($allImages as $index => $img): ?>
+                    <div class="carousel-slide <?= $index === 0 ? 'active' : '' ?>">
+                        <img src="/trivago/<?= htmlspecialchars($img['path']) ?>"
                              alt="Hotel photo <?= $index + 1 ?>">
+                        <?php if(!empty($img['caption'])): ?>
+                        <div class="carousel-caption">
+                            <span class="carousel-caption-text">
+                                <i class="bi bi-image me-1"></i><?= htmlspecialchars($img['caption']) ?>
+                            </span>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                     <?php endforeach; ?>
 
                     <?php if(count($allImages) > 1): ?>
@@ -333,7 +362,7 @@ include "layout/header.php";
                                     <span class="best-deal-badge">Best Deal</span>
                                 <?php endif; ?>
                             </p>
-                            <p class="partner-model mb-1"><?= $partner['Bkprt_MarketplaceModel'] ?> model</p>
+                            
                             <?php if($partner['Bkprt_VerificationStatus'] === 'Verified'): ?>
                                 <small style="color:#1a8c55;">
                                     <i class="bi bi-patch-check-fill me-1"></i>Verified Partner
@@ -346,8 +375,26 @@ include "layout/header.php";
                             <?php endif; ?>
                         </div>
                         <div class="text-end ms-3">
-                            <p class="partner-price mb-0">₱<?= number_format($partner['lowest_price'], 2) ?></p>
-                            <p class="partner-price-night mb-2">per night</p>
+                            
+                                <?php
+                                $nights = 1;
+                                if($checkin && $checkout){
+                                    $d1     = new DateTime($checkin);
+                                    $d2     = new DateTime($checkout);
+                                    $nights = max(1, $d2->diff($d1)->days);
+                                }
+                                $total = $partner['lowest_price'] * $nights;
+                                ?>
+                                <p class="partner-price mb-0">₱<?= number_format($partner['lowest_price'], 2) ?></p>
+                                <p class="partner-price-night mb-0">per night</p>
+                                <?php if($nights > 1): ?>
+                                    <p class="mb-2" style="font-size:13px; color:#1a8c55; font-weight:600;">
+                                        ₱<?= number_format($total, 2) ?> total · <?= $nights ?> nights
+                                    </p>
+                                <?php else: ?>
+                                    <p class="mb-2" style="font-size:12px; color:var(--trivago-muted);">1 night</p>
+                                <?php endif; ?>
+
                             <a href="<?= htmlspecialchars($partner['Bkprt_WebsiteURL']) ?>"
                                target="_blank" class="btn-view-deal">
                                 View Deal <i class="bi bi-box-arrow-up-right ms-1"></i>
@@ -371,17 +418,16 @@ include "layout/header.php";
 
 <script>
     let currentIndex = 0;
-    const slides = document.querySelectorAll('.carousel-img');
+    const slides  = document.querySelectorAll('.carousel-slide');
     const counter = document.getElementById('currentSlide');
 
-    function changeSlide(direction) {
+    function changeSlide(direction){
         slides[currentIndex].classList.remove('active');
         currentIndex = (currentIndex + direction + slides.length) % slides.length;
         slides[currentIndex].classList.add('active');
         if(counter) counter.textContent = currentIndex + 1;
     }
 
-    // Optional: keyboard arrow support
     document.addEventListener('keydown', function(e){
         if(e.key === 'ArrowLeft')  changeSlide(-1);
         if(e.key === 'ArrowRight') changeSlide(1);

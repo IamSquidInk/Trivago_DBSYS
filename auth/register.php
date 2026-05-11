@@ -39,8 +39,16 @@ if(isset($_POST['register'])){
     $stmt->bind_param("ssss", $email, $hashedPassword, $name, $createdDate);
     $stmt->execute();
 
-    $_SESSION['success'] = "Account registered successfully! You can now sign in.";
-    header("Location: register.php");
+    // ── AUTO LOGIN AFTER REGISTRATION ──
+    $newGuest = $conn->query("SELECT * FROM Guest WHERE Guest_Email = '$email' LIMIT 1")->fetch_assoc();
+
+    $_SESSION['guest_id']      = $newGuest['Guest_Id'];
+    $_SESSION['guest_name']    = $newGuest['Guest_Name'];
+    $_SESSION['guest_email']   = $newGuest['Guest_Email'];
+    $_SESSION['member_status'] = $newGuest['Guest_MemberStatus'];
+    $_SESSION['role']          = 'member';
+
+    header("Location: /trivago/index.php");
     exit();
 }
 

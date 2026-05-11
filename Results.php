@@ -104,13 +104,19 @@ include "layout/header.php";
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <label class="search-label-sm"><i class="bi bi-person me-1"></i>Guests</label>
-                    <select name="guests" class="form-control search-input-sm">
-                        <?php for($i = 1; $i <= 10; $i++): ?>
-                            <option value="<?= $i ?>" <?= $i == $guests ? 'selected' : '' ?>>
-                                <?= $i ?> Guest<?= $i > 1 ? 's' : '' ?>
-                            </option>
-                        <?php endfor; ?>
-                    </select>
+                    
+                    <div class="d-flex align-items-center border rounded-3 overflow-hidden" style="height:40px;">
+                        <button type="button" onclick="changeGuests(-1)"
+                                style="width:36px; height:100%; border:none; background:#f5f5f5;
+                                    font-size:18px; cursor:pointer; flex-shrink:0;">−</button>
+                        <input type="number" name="guests" id="guestCount" value="1" min="1" max="20"
+                            class="form-control border-0 text-center shadow-none"
+                            style="height:100%; border-radius:0;">
+                        <button type="button" onclick="changeGuests(1)"
+                                style="width:36px; height:100%; border:none; background:#f5f5f5;
+                                    font-size:18px; cursor:pointer; flex-shrink:0;">+</button>
+                    </div>
+
                 </div>
                 <div class="col-lg-2 col-md-12">
                     <button type="submit" class="btn btn-trivago w-100" style="padding:8px;">
@@ -212,5 +218,13 @@ include "layout/header.php";
         <?php endif; ?>
     <?php endif; ?>
 </div>
+
+<script>
+function changeGuests(amount){
+    const input = document.getElementById('guestCount');
+    const newVal = parseInt(input.value) + amount;
+    if(newVal >= 1 && newVal <= 20) input.value = newVal;
+}
+</script>
 
 <?php include "layout/footer.php"; ?>
