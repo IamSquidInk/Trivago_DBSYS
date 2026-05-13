@@ -187,6 +187,10 @@ include "../layout/header.php";
            class="sidebar-link <?= $currentPage === 'manage_partners.php' ? 'active-sidebar' : '' ?>">
             <i class="bi bi-handshake"></i> Partners
         </a>
+        <a href="manage_prices.php"
+           class="sidebar-link <?= $currentPage === 'manage_prices.php' ? 'active-sidebar' : '' ?>">
+            <i class="bi bi-tag"></i> Prices
+        </a>
 
         <hr style="border-color:#f0f0f0; margin: 16px 0;">
 
