@@ -356,12 +356,14 @@ include "layout/header.php";
                     <?php while($partner = $priceQuery->fetch_assoc()): ?>
                     <div class="partner-card <?= $first ? 'best-deal' : '' ?>">
                         <div>
-                            <p class="partner-name mb-0">
-                                <?= htmlspecialchars($partner['Bkprt_Name']) ?>
+                            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:0;">
+                                <span class="partner-name mb-0">
+                                    <?= htmlspecialchars($partner['Bkprt_Name']) ?>
+                                </span>
                                 <?php if($first): ?>
                                     <span class="best-deal-badge">Best Deal</span>
                                 <?php endif; ?>
-                            </p>
+                            </div>
                             
                             <?php if($partner['Bkprt_VerificationStatus'] === 'Verified'): ?>
                                 <small style="color:#1a8c55;">
