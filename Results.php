@@ -92,15 +92,16 @@ include "layout/header.php";
                     <input type="text" name="destination" class="form-control search-input-sm"
                            value="<?= htmlspecialchars($destination) ?>" required>
                 </div>
-                <div class="col-lg-2 col-md-6">
-                    <label class="search-label-sm"><i class="bi bi-calendar me-1"></i>Check-in</label>
-                    <input type="date" name="checkin" class="form-control search-input-sm"
-                           value="<?= htmlspecialchars($checkin) ?>" required>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <label class="search-label-sm"><i class="bi bi-calendar-check me-1"></i>Check-out</label>
-                    <input type="date" name="checkout" class="form-control search-input-sm"
-                           value="<?= htmlspecialchars($checkout) ?>" required>
+                <div class="col-lg-4 col-md-6">
+                    <label class="search-label"><i class="bi bi-calendar me-1"></i>Check-in — Check-out</label>
+                    <div class="d-flex align-items-center border rounded-3 overflow-hidden"
+                        style="border: 1.5px solid #e0e0e0 !important; background:#fff;">
+                        <input type="date" name="checkin" class="form-control border-0 shadow-none search-input"
+                            style="border-radius:0; flex:1;" required>
+                        <div style="width:1px; height:24px; background:#e0e0e0; flex-shrink:0;"></div>
+                        <input type="date" name="checkout" class="form-control border-0 shadow-none search-input"
+                            style="border-radius:0; flex:1;" required>
+                    </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <label class="search-label-sm"><i class="bi bi-person me-1"></i>Guests</label>
