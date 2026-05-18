@@ -29,10 +29,10 @@ if(isset($_POST['login'])){
             // ========================
             // REDIRECT
             // ========================
-            if($_SESSION['role'] === 'admin'){
+            if ($_SESSION['role'] === 'admin') {
                 header("Location: /trivago/admin/admin_dashboard.php");
             } else {
-                header("Location: /trivago/index.php");
+                header("Location: /trivago/user/user_dashboard.php");
             }
             exit();
 

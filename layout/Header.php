@@ -225,15 +225,14 @@ if(session_status() === PHP_SESSION_NONE){
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                 <li>
-                                    <a class="dropdown-item" href="#"
-                                       data-bs-toggle="modal" data-bs-target="#profileModal">
-                                        <i class="bi bi-person me-2"></i>Profile
+                                    <a class="dropdown-item" href="/trivago/user/user_dashboard.php">
+                                        <i class="bi bi-speedometer2 me-2"></i>My Dashboard
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item text-danger"
-                                       href="/trivago/auth/logout.php">
+                                    href="/trivago/auth/logout.php">
                                         <i class="bi bi-box-arrow-right me-2"></i>Logout
                                     </a>
                                 </li>
