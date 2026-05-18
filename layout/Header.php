@@ -221,7 +221,7 @@ if(session_status() === PHP_SESSION_NONE){
                             <button class="btn btn-trivago dropdown-toggle"
                                     data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle me-1"></i>
-                                <?= htmlspecialchars($_SESSION['guest_name'] ?? 'User') ?>
+                                Hi, <?= htmlspecialchars($_SESSION['guest_name'] ?? 'User') ?>!
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                 <li>

@@ -85,7 +85,11 @@ include "layout/header.php";
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
                 <h1 class="hero-title">Find your <span>ideal hotel</span> deal</h1>
-                <p class="hero-subtitle">Compare hotel prices from hundreds of sites in seconds.</p>
+                <?php if (isset($_SESSION['guest_id'])): ?>
+                    <p class="hero-subtitle">Welcome back, <strong><?= htmlspecialchars($_SESSION['guest_name']) ?></strong>! Where are you headed next?</p>
+                <?php else: ?>
+                    <p class="hero-subtitle">Compare hotel prices from hundreds of sites in seconds.</p>
+                <?php endif; ?>
             </div>
         </div>
 
