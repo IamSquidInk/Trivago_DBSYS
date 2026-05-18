@@ -199,10 +199,28 @@ include "layout/header.php";
                             </p>
                         </div>
                         <div class="hotel-result-price">
+
+                            <?php
+                            $nights = 1;
+                            if ($checkin && $checkout) {
+                                $d1 = new DateTime($checkin);
+                                $d2 = new DateTime($checkout);
+                                $nights = max(1, $d2->diff($d1)->days);
+                            }
+                            $total = $hotel['lowest_price'] * $nights;
+                            ?>
                             <p class="price-from">From</p>
                             <p class="price-amount">₱<?= number_format($hotel['lowest_price'], 2) ?></p>
                             <p class="price-night">per night</p>
+                            <?php if ($nights > 1): ?>
+                                <p style="font-size:13px; color:#1a8c55; font-weight:600; margin-bottom:10px;">
+                                    ₱<?= number_format($total, 2) ?> total · <?= $nights ?> nights
+                                </p>
+                            <?php else: ?>
+                                <p style="font-size:12px; color:var(--trivago-muted); margin-bottom:10px;">1 night</p>
+                            <?php endif; ?>
                             <span class="btn btn-trivago btn-sm">See deals</span>
+
                         </div>
                     </div>
                 </div>
